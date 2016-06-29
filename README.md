@@ -1,3 +1,12 @@
+# etlpro - PostgreSQL and JOIN version
+
+This fork of the original etlpro repo tries to address the idea that the so-called "co-operative" version (etl_co.py), which is the recommended way by MongoDB pros to ETL the data, is just an application re-implementation of a merge join.
+
+This fork adds a fifth way of doing this ETL that uses a single database query based on JOINS and simple little magic available on almost every SQL database: aggregate operations and arrays. To demonstrate this, PostgreSQL (rather than MySQL is used). For the sake of simplicity, batch versions have been removed.
+
+What follows is the original README.
+
+
 # etlpro
 
 These are the programs I discussed in my talk **ETL for Pros – Getting Data Into MongoDB The Right Way** at MongoDB World 2016.  They show various ways to get from a relational table structure to MongoDB documents.

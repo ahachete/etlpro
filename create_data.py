@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 import random, string, datetime, pytz
-import mysql.connector
+import psycopg2
+import database
 
 def randomword(minlength, maxlength):
     length = random.randint(minlength, maxlength)
@@ -13,14 +14,16 @@ insert_order_stmt = ( "insert into orders (id, first_name, last_name, shipping_a
                       "values (%s, %s, %s, %s)" )
 insert_item_stmt = ( "insert into items (id, order_id, qty, description, price) "
                      "values (%s, %s, %s, %s, %s)" )
-insert_tracking_stmt = ( "insert into tracking (order_id, status, timestamp) "
+insert_tracking_stmt = ( "insert into tracking (order_id, status, tmstmp) "
                          "values (%s, %s, %s)" )
 
-cnx = mysql.connector.connect(user='root', password='hello', database='etlpro')
-cnx.time_zone = 'UTC'
+cnx = psycopg2.connect(database.dsn())
 cursor = cnx.cursor()
+cursor.execute("SET TimeZone To 'UTC'")
 
-for order_num in range(1,1000000):
+n_orders = 1000000
+
+for order_num in range(1,n_orders):
     first_name = randomword(5,15)
     last_name = randomword(10,20)
     shipping_address = randomword(10,15) + " " + randomword(10, 15) + ", " + randomword(10,15)

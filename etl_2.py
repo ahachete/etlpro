@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
-import MySQLdb
+import psycopg2
+import database
 from pymongo import MongoClient
 
 client = MongoClient("localhost:27017")
 db = client.etlpro
 orders = db.orders
 
-cnx = MySQLdb.connect(user='root', passwd='hello', db='etlpro')
+cnx = psycopg2.connect(database.dsn())
 #cnx.time_zone = 'UTC'
 cursor = cnx.cursor()
 
@@ -38,7 +39,7 @@ for (item_id, order_id, qty, description, price) in cursor:
 
 
 cursor.execute("""
-        select order_id, status, timestamp from tracking
+        select order_id, status, tmstmp from tracking
     """ )
 for (order_id, status, time_stamp) in cursor:
     orders.update_one({"order_id" : order_id},

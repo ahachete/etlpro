@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-import MySQLdb
+import psycopg2
+import database
 from pymongo import MongoClient
 from collections import defaultdict
 
@@ -8,7 +9,7 @@ client = MongoClient("localhost:27017")
 db = client.etlpro
 orders = db.orders
 
-cnx = MySQLdb.connect(user='root', passwd='hello', db='etlpro')
+cnx = psycopg2.connect(database.dsn())
 #cnx.time_zone = 'UTC'
 cursor = cnx.cursor()
 
@@ -31,7 +32,7 @@ print "items loaded"
 
 tracking = defaultdict(list)
 cursor.execute("""
-        select order_id, status, timestamp from tracking
+        select order_id, status, tmstmp from tracking
     """ )
 prevlen = 0
 for (order_id, status, time_stamp) in cursor:
