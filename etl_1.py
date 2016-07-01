@@ -3,10 +3,14 @@
 import psycopg2
 from pymongo import MongoClient
 import database
+import sys
+from mongo_batch import MongoBatch
+
 
 client = MongoClient("localhost:27017")
 db = client.etlpro
 orders = db.orders
+batch = MongoBatch(orders, int(sys.argv[1])) if (len(sys.argv) > 1 and sys.argv[1].isdigit()) else MongoBatch(orders)
 
 cnx = psycopg2.connect(database.dsn())
 
@@ -51,11 +55,12 @@ for (order_id, first_name, last_name, shipping_address) in cursor:
     for (order_id, status, time_stamp) in tracking_cursor:
         tracking_list.append( { "status" : status,
                                 "timestamp" : time_stamp } )
-    orders.insert_one(doc)
+    batch.add(doc)
 
 cursor.close()
 item_cursor.close()
 tracking_cursor.close()
 cnx.close()
 
+batch.finalize()
 client.close()
