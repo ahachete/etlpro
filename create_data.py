@@ -3,6 +3,13 @@
 import random, string, datetime, pytz
 import psycopg2
 import database
+import sys
+
+
+n_orders = 1000000
+
+if len(sys.argv) > 1 and sys.argv[1].isdigit():
+	n_orders = int(sys.argv[1])
 
 def randomword(minlength, maxlength):
     length = random.randint(minlength, maxlength)
@@ -21,9 +28,12 @@ cnx = psycopg2.connect(database.dsn())
 cursor = cnx.cursor()
 cursor.execute("SET TimeZone To 'UTC'")
 
-n_orders = 1000000
+ddl_file = open('ddl.sql')
+ddl = ddl_file.read()
+ddl_file.close()
+cursor.execute(ddl)
 
-for order_num in range(1,n_orders):
+for order_num in range(1,n_orders + 1):
     first_name = randomword(5,15)
     last_name = randomword(10,20)
     shipping_address = randomword(10,15) + " " + randomword(10, 15) + ", " + randomword(10,15)
@@ -62,6 +72,11 @@ for order_num in range(1,n_orders):
         print order_num
 
 cnx.commit()
+
+cursor.execute("ANALYZE orders")
+cursor.execute("ANALYZE items")
+cursor.execute("ANALYZE tracking")
+
 cursor.close()
 cnx.close()
 
